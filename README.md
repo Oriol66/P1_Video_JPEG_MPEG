@@ -1,9 +1,12 @@
 # P1_Video_JPEG_MPEG
 
 Aquest script conté els 6 exercicis proposats en la pràctica.
+
 Cal compilar en python.
-Cal posar la direcció d'on es troba la carpeta ffmpeg en la variable ffmpeg_direction. De normal,la comanda només s'ha de canviar per 'ffmpeg'.
-S'utilitza la imatge berlin_wall.jpg
+
+Cal posar la direcció d'on es troba la carpeta ffmpeg en la variable ffmpeg_direction. De normal, la comanda només s'ha de canviar per 'ffmpeg'.
+
+A part s'utilitza la imatge berlin_wall.jpg carregada en el repositori.
 
 Es compilaran els 6 exercicis de cop. L'ordre que segueix el codi és el mateix per cada exercici, s'implementa la funció i es fa el seu test.
 
