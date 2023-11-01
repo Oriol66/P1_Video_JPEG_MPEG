@@ -2,9 +2,10 @@
 # Importem llibreries necesàries
 import subprocess
 import numpy as np
+import cv2
 from scipy.fftpack import dct, idct
 
-
+ffmpeg_direction = "C:/Users/oriol/PycharmProjects/Pràctica2_Codificació d'audio i video/ffmpeg/ffmpeg-2023-10-29-git-2532e832d2-full_build/bin/ffmpeg.exe"
 ##### Exercise 1 ######
 def rgb_to_yub(r,g,b):
     y = round(0.299*r + 0.587*g +0.114*b)
@@ -23,7 +24,7 @@ r, g, b = 255, 255, 0               #Define RGB values
 y, u, v = rgb_to_yub(r, g, b)       #Convert RGB to YUV
 nr, ng, nb = yuv_to_rgb(y, u ,v)    #Reconvert YUV to new RGB values
 
-print("\nExercise1\n")
+print("\nExercise1")
 print('RGB = ', r, g, b, ' is converted to YUV = ', y, u, v)
 print('RGB = ', y, u, v, ' is converted to YUV = ', nr, ng, nb)
 
@@ -32,106 +33,72 @@ print('RGB = ', y, u, v, ' is converted to YUV = ', nr, ng, nb)
 ###### Exercise 2 ######
 def resize_image(input, output):
 
-    ffmpeg_command = ["ffmpeg", "-i", input, "-vf", "scale=640:-1", "-q:v", "2", output]
+    ffmpeg_command = [ffmpeg_direction, "-i", input, "-vf", "scale=640:-1", "-q:v", "2", output]
     subprocess.run(ffmpeg_command)
 
 # Test Ex2
-input = "/home/vboxuser/Downloads/berlin_wall.jpg"
-output = "/home/vboxuser/Downloads/berlin_wall_resize.jpg"
-#resize_image(input, output)
+input = "berlin_wall.jpg"
+output = "berlin_wall_resized.jpg"
+resize_image(input, output)
+print("\nExercise 2 convert the quality of berlin_wall.jpg and save berlin_wall_resized.jpg")
 
 
 
 ###### Exercise 3 ######
-def serpentine(imagen_path):
-    with open(imagen_path, 'rb') as imagen_file:
-        imagen_file.read(
-            54)  # Suposem que treballem amb 24 bits, per tant el encapcelament té 54
-        # Tamany de la imatge
-        ancho = int.from_bytes(imagen_file.read(4), byteorder='little')
-        alto = int.from_bytes(imagen_file.read(4), byteorder='little')
+def serpentine(input_image):
+    # Leer la imagen utilizando OpenCV
+    image = cv2.imread(input_image, cv2.IMREAD_GRAYSCALE)
 
-        datos_serpentina = []
+    # Obtener las dimensiones de la imagen
+    height, width = image.shape
+
+    # Inicializar la matriz de salida
+    output_matrix = np.zeros((height, width), dtype=np.uint8)
+
+    # Inicializar las coordenadas de inicio
+    x, y = 0, 0
+
+    # Inicializar la dirección (1 para derecha, -1 para izquierda)
+    direction = 1
+
+    for value in range(256):
+        if direction == 1:
+            for _ in range(width):
+                output_matrix[y, x] = image[y, x]
+                x += 1
+            x -= 1
+            y += 1
+            direction = -1
+        else:
+            for _ in range(width):
+                output_matrix[y, x] = image[y, x]
+                x -= 1
+            x += 1
+            y += 1
+            direction = 1
+
+    return output_matrix
 
 
-        izquierda_a_derecha = True
-        fila_actual = 0
-
-        for _ in range(ancho * alto):
-
-            b = ord(imagen_file.read(1))
-            g = ord(imagen_file.read(1))
-            r = ord(imagen_file.read(1))
-
-            datos_serpentina.append((r, g, b))
-
-            if izquierda_a_derecha:
-                if fila_actual % 2 == 0:
-                    # Seguent columna
-                    if fila_actual % 2 == 0:
-                        if fila_actual % 2 == 0:
-                            imagen_file.seek(3, 1)
-                        else:
-                            imagen_file.seek(6, 1)
-                    else:
-                        imagen_file.seek(3, 1)
-                else:
-                    # Retrocedeix la columna anterior
-                    imagen_file.seek(-3, 1)
-            else:
-                if fila_actual % 2 == 0:
-                    # Retrocedeix la fila
-                    if fila_actual % 2 == 0:
-                        if fila_actual % 2 == 0:
-                            imagen_file.seek(-3, 1)
-                        else:
-                            imagen_file.seek(-6, 1)
-                    else:
-                        imagen_file.seek(-3, 1)
-                else:
-                    # Seguent columna
-                    imagen_file.seek(3, 1)
-
-            # Actualiza fila i direcció de lectura
-            if izquierda_a_derecha:
-                if fila_actual % 2 == 0:
-                    fila_actual += 1
-                else:
-                    fila_actual -= 1
-            else:
-                if fila_actual % 2 == 0:
-                    fila_actual -= 1
-                else:
-                    fila_actual += 1
-
-            # Canvi de direcció si és necesssari
-            if fila_actual >= alto or fila_actual < 0:
-                izquierda_a_derecha = not izquierda_a_derecha
-                if fila_actual >= alto:
-                    fila_actual = alto - 1
-                else:
-                    fila_actual = 0
-
-    return datos_serpentina
-
-# Test Ex3
-size = serpentine(input)
-
+imagen_path = "berlin_wall.jpg"  # Reemplaza "tu_imagen.bmp" con la ruta de tu imagen (formato BMP de 24 bits)
+matriz_serpentina = serpentine(imagen_path)
+print("\nExercise 3: read in serpentine mode and we obtain the image:\nThe print shows the first 20x20values of the image:\n",matriz_serpentina[:20,:20])
 
 
 ###### Exercise 4 ######
 def bw_transform(input_image, output_image):
-    # Tassa de bits muy baja para una máxima compressión = 32k
-    command = ["ffmpeg", "-i", input_image, "-vf", "format=gray", "-q:v", "32k", output_image]
+    #Max tax compression = 32k
+    command = [ffmpeg_direction, "-i", input_image, "-vf", "format=gray", "-q:v", "32k", output_image]
     subprocess.run(command)
 
 # Test Ex4
-bw_output = "/home/vboxuser/Downloads/berlin_wall_black_and_white.jpg"
+bw_output = "berlin_wall_black_and_white.jpg"
 bw_image = bw_transform(input, bw_output)
+print("\nExercise 4 save berlin_wall_black_and_white.jpg")
 
 
 ###### Exercise 5 ######
-def run_length_encoding(bits ):
+def run_length_encoding(bits):
     encoded = []
     count = 1
     for i in range(1, len(bits)):
@@ -146,7 +113,7 @@ def run_length_encoding(bits ):
 # Test Ex5
 bits = "0001100001111"
 code = run_length_encoding(bits)
-print(code)
+print("\nExercise 5 code the bits ",bits, " to ", code)
 
 
 ###### Exercise 6 ######
@@ -171,11 +138,11 @@ encoded_matrix = dct_converter.encode(input_matrix) #Matrix DCT encode
 decoded_matrix = dct_converter.decode(encoded_matrix) #Matrix inverse DCT decode
 
 print("\nExercise 6:")
-print("Matriu de entrada:")
+print("Input matrix:")
 print(input_matrix)
 
-print("\nMatriu codificada:")
+print("\nCoded matrix:")
 print(encoded_matrix)
 
-print("\nMatriu decodificada:")
+print("\nDecoded matrix:")
 print(decoded_matrix)
