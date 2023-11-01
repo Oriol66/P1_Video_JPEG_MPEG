@@ -10,6 +10,7 @@ A part s'utilitza la imatge berlin_wall.jpg carregada en el repositori.
 
 Es compilaran els 6 exercicis de cop. L'ordre que segueix el codi és el mateix per cada exercici, s'implementa la funció i es fa el seu test.
 
+
 Exercici 1:
   Es creen dues funcions. Una converteix de rgb a yuv i l'altre de yuv a rgb.
 
