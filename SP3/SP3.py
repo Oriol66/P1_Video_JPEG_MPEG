@@ -177,30 +177,3 @@ final_path = GUIcode(comboCode, GUIProcessor) #Agafem el path del video codifica
 
 root.mainloop()
 
-
-
-#### MAIN  EX 1, 2####
-input_direction = '(Short) Big Buck Bunny.mp4'
-
-# Exercici 1:
-input_proc = Processor(input_direction)
-#Obtenim BBB en diferents resolucions
-#input_proc.quality_converter('240p', 'BBB_240p.mp4')
-#input_proc.quality_converter('360p', 'BBB_360p.mp4')
-#input_proc.quality_converter('480p', 'BBB_480p.mp4')
-#input_proc.quality_converter('720p', 'BBB_720p.mp4')
-
-#Agafem el video de BBB amb millor calitat i el codifiquem amb 4 diferents codecs
-BBB_processor = Processor('BBB_720p.mp4')
-
-#BBB_processor.convert_to_VP8('BBB_VP8.webm')  #El format de VP8 és .web
-#BBB_processor.convert_to_VP9('BBB_VP9.webm')
-#BBB_processor.convert_to_h265('BBB_h265.mp4') #Format h.265 és .mp4
-#BBB_processor.convert_to_AV1('BBB_AV1.mkv')    #Format AV1 és .mkv
-
-
-# Exercici 2:
-#BBB_processor.combine_videos('BBB_VP8.webm', 'BBB_VP9.webm', 'BBB_VP8_vs_BP9.mp4')
-#BBB_processor.combine_videos('BBB_VP8.webm', 'BBB_h265.mp4', 'BBB_AV1.mkv')
-
-
